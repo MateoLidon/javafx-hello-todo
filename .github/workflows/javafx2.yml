@@ -9,9 +9,12 @@ name: JavaFX  with Gradle
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - "v*"
+
+  permissions: 
+  contents: write
+
 
 jobs:
   build:
@@ -44,3 +47,16 @@ jobs:
     - name: Create application
       run: jpackage --input build/ ` --name HelloWorldFx ` --main-jar HelloWorldFx.jar ` --main-class dam.optativa.HelloWorldFx ` --type exe ` --module-path javafx-sdk/javafx-sdk-21.0.10/lib ` --add-modules javafx.controls
 
+
+    - name: Upload executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: HelloWorldFx-Executable
+        path: HelloWorldFx-1.0.exe
+
+
+    - name: Release
+      uses: actions/action-gh-release@v2
+      if: github.ref_type == 'tag' # Filtro
+      with:
+        files: "*.exe"
